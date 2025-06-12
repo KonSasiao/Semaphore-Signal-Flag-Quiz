@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-Hant">
 <head>
   <meta charset="UTF-8">
-  <title>Semaphore Signal Flag Quiz</title>
+  <title>手旗遊戲</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -55,6 +55,7 @@
     }
     #correct-container {
       margin-top: 15px;
+      font-size: 2em;
     }
     .mode-btn {
       margin: 5px;
@@ -64,19 +65,19 @@
   </style>
 </head>
 <body>
-  <h1>Semaphore Signal Flag Quiz</h1>
+  <h1>手旗動作對照遊戲</h1>
   <div id="mode-selection">
-    <button class="mode-btn" onclick="setMode('letter-to-image')">Letter ➜ Image</button>
-    <button class="mode-btn" onclick="setMode('image-to-letter')">Image ➜ Letter</button>
+    <button class="mode-btn" onclick="setMode('letter-to-image')">英文字母 ➜ 手旗圖片</button>
+    <button class="mode-btn" onclick="setMode('image-to-letter')">手旗圖片 ➜ 英文字母</button>
   </div>
-  <div id="question">Choose the matching flag position:</div>
+  <div id="question">請選出正確的手旗動作：</div>
   <div id="letter-display"></div>
   <div id="image-question"></div>
   <div id="timer"></div>
   <div id="choices-container"></div>
   <div id="feedback"></div>
   <div id="correct-container"></div>
-  <button id="remember-button" onclick="startNextRound()">I Got It!</button>
+  <button id="remember-button" onclick="startNextRound()">我記住了</button>
 
   <script>
     const allLetters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
@@ -102,10 +103,10 @@
     function startTimer() {
       clearInterval(timerInterval);
       timeLeft = 5;
-      document.getElementById('timer').innerText = `⏳ ${timeLeft} seconds left`;
+      document.getElementById('timer').innerText = `⏳ ${timeLeft} 秒內作答`;
       timerInterval = setInterval(() => {
         timeLeft--;
-        document.getElementById('timer').innerText = `⏳ ${timeLeft} seconds left`;
+        document.getElementById('timer').innerText = `⏳ ${timeLeft} 秒內作答`;
         if (timeLeft <= 0) {
           clearInterval(timerInterval);
           handleTimeout();
@@ -132,7 +133,7 @@
         choices.forEach(letter => {
           const img = document.createElement('img');
           img.src = `${letter}.png`;
-          img.alt = `Flag ${letter}`;
+          img.alt = `手旗 ${letter}`;
           img.classList.add('choice-image');
           img.onclick = () => handleChoice(letter);
           container.appendChild(img);
@@ -140,7 +141,7 @@
       } else if (gameMode === 'image-to-letter') {
         const questionImg = document.createElement('img');
         questionImg.src = `${currentAnswer}.png`;
-        questionImg.alt = `Question Image`;
+        questionImg.alt = `問題圖片`;
         questionImg.classList.add('image-question-img');
         document.getElementById('image-question').appendChild(questionImg);
 
@@ -158,7 +159,11 @@
 
     function showCorrectAnswerImage() {
       const container = document.getElementById('correct-container');
-      container.innerHTML = `<div>✅ Correct Answer:</div><img id="correct-image" src="${currentAnswer}.png" alt="Correct Flag">`;
+      if (gameMode === 'letter-to-image') {
+        container.innerHTML = `<div>✅ 正確答案：</div><img id="correct-image" src="${currentAnswer}.png" alt="正確手旗">`;
+      } else if (gameMode === 'image-to-letter') {
+        container.innerHTML = `<div>✅ 正確答案是：${currentAnswer}</div>`;
+      }
     }
 
     function handleChoice(selected) {
@@ -168,10 +173,10 @@
 
       const feedback = document.getElementById('feedback');
       if (selected === currentAnswer) {
-        feedback.innerText = '✅ Correct!';
+        feedback.innerText = '✅ 答對了！';
         setTimeout(startNextRound, 800);
       } else {
-        feedback.innerText = `❌ Wrong!`;
+        feedback.innerText = `❌ 答錯了！`;
         showCorrectAnswerImage();
         document.getElementById('remember-button').style.display = 'inline-block';
       }
@@ -179,7 +184,7 @@
 
     function handleTimeout() {
       roundLocked = true;
-      document.getElementById('feedback').innerText = `⏰ Time's up!`;
+      document.getElementById('feedback').innerText = `⏰ 時間到！`;
       showCorrectAnswerImage();
       document.getElementById('remember-button').style.display = 'inline-block';
     }
