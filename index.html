@@ -105,7 +105,7 @@
 
       choices.forEach(letter => {
         const img = document.createElement('img');
-        img.src = `images/${letter}.png`;
+        img.src = `${letter}.png`;
         img.alt = `Flag position ${letter}`;
         img.classList.add('choice-image');
         img.onclick = () => handleChoice(letter);
@@ -117,7 +117,7 @@
 
     function showCorrectAnswerImage() {
       const container = document.getElementById('correct-container');
-      container.innerHTML = `<div>✅ Correct Answer:</div><img id="correct-image" src="images/${currentAnswer}.png" alt="Correct Flag">`;
+      container.innerHTML = `<div>✅ Correct Answer:</div><img id="correct-image" src="${currentAnswer}.png" alt="Correct Flag">`;
     }
 
     function handleChoice(selected) {
