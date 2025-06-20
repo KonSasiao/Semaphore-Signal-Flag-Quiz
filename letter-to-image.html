@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <title>英文字母 ➜ 手旗圖片</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f0f4f8;
+      text-align: center;
+      padding: 20px;
+    }
+    h1 {
+      margin-bottom: 20px;
+    }
+    #letter-display {
+      font-size: 3em;
+      margin: 20px 0;
+    }
+    .choice-image {
+      width: 120px;
+      margin: 10px;
+      border-radius: 10px;
+      cursor: pointer;
+      border: 3px solid transparent;
+      transition: transform 0.2s, border 0.2s;
+    }
+    .choice-image:hover {
+      transform: scale(1.1);
+      border: 3px solid #4CAF50;
+    }
+    #choices-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    #feedback, #timer, #correct-container {
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>英文字母 ➜ 手旗圖片</h1>
+  <div id="letter-display"></div>
+  <div id="choices-container"></div>
+  <div id="feedback"></div>
+  <div id="timer"></div>
+  <div id="correct-container"></div>
+  <button id="retry-button" style="display:none" onclick="startGame()">再來一次</button>
+  <script>
+    const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+    let currentAnswer = '';
+    let timer;
+
+    function getRandomChoices(answer, count = 4) {
+      const pool = letters.filter(l => l !== answer);
+      const result = pool.sort(() => 0.5 - Math.random()).slice(0, count - 1);
+      result.push(answer);
+      return result.sort(() => 0.5 - Math.random());
+    }
+
+    function startGame() {
+      document.getElementById('retry-button').style.display = 'none';
+      document.getElementById('feedback').innerText = '';
+      document.getElementById('correct-container').innerText = '';
+      document.getElementById('choices-container').innerHTML = '';
+
+      currentAnswer = letters[Math.floor(Math.random() * letters.length)];
+      document.getElementById('letter-display').innerText = currentAnswer;
+
+      const choices = getRandomChoices(currentAnswer);
+      const container = document.getElementById('choices-container');
+      choices.forEach(letter => {
+        const img = document.createElement('img');
+        img.src = `images/${letter}.png`;
+        img.alt = letter;
+        img.className = 'choice-image';
+        img.onclick = () => handleChoice(letter);
+        container.appendChild(img);
+      });
+
+      startTimer();
+    }
+
+    function handleChoice(selected) {
+      clearInterval(timer);
+      if (selected === currentAnswer) {
+        document.getElementById('feedback').innerText = '✅ 答對了！';
+        setTimeout(startGame, 1000);
+      } else {
+        document.getElementById('feedback').innerText = '❌ 答錯了！';
+        document.getElementById('correct-container').innerHTML = `正確答案是：<img src="images/${currentAnswer}.png" alt="答案" class="choice-image">`;
+        document.getElementById('retry-button').style.display = 'inline-block';
+      }
+    }
+
+    function startTimer() {
+      let timeLeft = 5;
+      const timerDisplay = document.getElementById('timer');
+      timerDisplay.innerText = `⏳ ${timeLeft} 秒內作答`;
+      timer = setInterval(() => {
+        timeLeft--;
+        timerDisplay.innerText = `⏳ ${timeLeft} 秒內作答`;
+        if (timeLeft <= 0) {
+          clearInterval(timer);
+          document.getElementById('feedback').innerText = '⏰ 時間到！';
+          document.getElementById('correct-container').innerHTML = `正確答案是：<img src="images/${currentAnswer}.png" alt="答案" class="choice-image">`;
+          document.getElementById('retry-button').style.display = 'inline-block';
+        }
+      }, 1000);
+    }
+
+    startGame();
+  </script>
+</body>
+</html>
