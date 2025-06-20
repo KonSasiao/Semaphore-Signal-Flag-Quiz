@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>英文字母 ➜ 手旗圖片</title>
   <style>
     body {
@@ -14,28 +14,35 @@
       margin-bottom: 20px;
     }
     #letter-display {
-      font-size: 3em;
+      font-size: 4em;
       margin: 20px 0;
     }
     .choice-image {
       width: 120px;
-      margin: 10px;
+      height: auto;
       border-radius: 10px;
-      cursor: pointer;
       border: 3px solid transparent;
+      cursor: pointer;
       transition: transform 0.2s, border 0.2s;
     }
     .choice-image:hover {
-      transform: scale(1.1);
+      transform: scale(1.05);
       border: 3px solid #4CAF50;
     }
     #choices-container {
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
-    }
-    #feedback, #timer, #correct-container {
+      gap: 20px;
       margin-top: 20px;
+    }
+    #feedback, #timer, #correct-answer {
+      margin-top: 20px;
+    }
+    #correct-answer img {
+      max-width: 120px;
+      border-radius: 10px;
+      margin-top: 10px;
     }
   </style>
 </head>
@@ -45,12 +52,13 @@
   <div id="choices-container"></div>
   <div id="feedback"></div>
   <div id="timer"></div>
-  <div id="correct-container"></div>
+  <div id="correct-answer"></div>
   <button id="retry-button" style="display:none" onclick="startGame()">再來一次</button>
   <script>
     const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
     let currentAnswer = '';
     let timer;
+    let roundLocked = false;
 
     function getRandomChoices(answer, count = 4) {
       const pool = letters.filter(l => l !== answer);
@@ -62,8 +70,10 @@
     function startGame() {
       document.getElementById('retry-button').style.display = 'none';
       document.getElementById('feedback').innerText = '';
-      document.getElementById('correct-container').innerText = '';
+      document.getElementById('correct-answer').innerText = '';
       document.getElementById('choices-container').innerHTML = '';
+      document.getElementById('letter-display').innerText = '';
+      roundLocked = false;
 
       currentAnswer = letters[Math.floor(Math.random() * letters.length)];
       document.getElementById('letter-display').innerText = currentAnswer;
@@ -73,8 +83,8 @@
       choices.forEach(letter => {
         const img = document.createElement('img');
         img.src = `images/${letter}.png`;
-        img.alt = letter;
         img.className = 'choice-image';
+        img.alt = letter;
         img.onclick = () => handleChoice(letter);
         container.appendChild(img);
       });
@@ -83,13 +93,16 @@
     }
 
     function handleChoice(selected) {
+      if (roundLocked) return;
       clearInterval(timer);
+      roundLocked = true;
+
       if (selected === currentAnswer) {
         document.getElementById('feedback').innerText = '✅ 答對了！';
         setTimeout(startGame, 1000);
       } else {
         document.getElementById('feedback').innerText = '❌ 答錯了！';
-        document.getElementById('correct-container').innerHTML = `正確答案是：<img src="images/${currentAnswer}.png" alt="答案" class="choice-image">`;
+        document.getElementById('correct-answer').innerHTML = `正確答案：<br><img src="images/${currentAnswer}.png" alt="正確答案">`;
         document.getElementById('retry-button').style.display = 'inline-block';
       }
     }
@@ -103,8 +116,9 @@
         timerDisplay.innerText = `⏳ ${timeLeft} 秒內作答`;
         if (timeLeft <= 0) {
           clearInterval(timer);
+          roundLocked = true;
           document.getElementById('feedback').innerText = '⏰ 時間到！';
-          document.getElementById('correct-container').innerHTML = `正確答案是：<img src="images/${currentAnswer}.png" alt="答案" class="choice-image">`;
+          document.getElementById('correct-answer').innerHTML = `正確答案：<br><img src="images/${currentAnswer}.png" alt="正確答案">`;
           document.getElementById('retry-button').style.display = 'inline-block';
         }
       }, 1000);

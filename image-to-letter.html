@@ -56,6 +56,7 @@
     const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
     let currentAnswer = '';
     let timer;
+    let roundLocked = false;
 
     function getRandomChoices(answer, count = 4) {
       const pool = letters.filter(l => l !== answer);
@@ -70,6 +71,7 @@
       document.getElementById('correct-answer').innerText = '';
       document.getElementById('choices-container').innerHTML = '';
       document.getElementById('image-question').innerHTML = '';
+      roundLocked = false;
 
       currentAnswer = letters[Math.floor(Math.random() * letters.length)];
       const img = document.createElement('img');
@@ -92,7 +94,10 @@
     }
 
     function handleChoice(selected) {
+      if (roundLocked) return;
       clearInterval(timer);
+      roundLocked = true;
+
       if (selected === currentAnswer) {
         document.getElementById('feedback').innerText = '✅ 答對了！';
         setTimeout(startGame, 1000);
@@ -112,6 +117,7 @@
         timerDisplay.innerText = `⏳ ${timeLeft} 秒內作答`;
         if (timeLeft <= 0) {
           clearInterval(timer);
+          roundLocked = true;
           document.getElementById('feedback').innerText = '⏰ 時間到！';
           document.getElementById('correct-answer').innerText = `正確答案是：${currentAnswer}`;
           document.getElementById('retry-button').style.display = 'inline-block';
